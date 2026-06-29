@@ -15,6 +15,7 @@
   --color-bg: #0f0f1a;
   --color-bg-card: #16162a;
   --color-bg-elevated: #1e1e35;
+  --color-bg-header: rgba(15, 15, 26, 0.85);
   --color-border: rgba(99, 102, 241, 0.15);
   --color-border-hover: rgba(99, 102, 241, 0.4);
 
@@ -37,6 +38,23 @@
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
   --transition-slow: 400ms ease;
+}
+
+:root.light {
+  --color-bg: #f8fafc;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #f1f5f9;
+  --color-bg-header: rgba(255, 255, 255, 0.85);
+  --color-border: rgba(99, 102, 241, 0.1);
+  --color-border-hover: rgba(99, 102, 241, 0.25);
+  
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+  
+  --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.1);
 }
 
 /* ─── Base Styles ─────────────────────────────────────────────────── */

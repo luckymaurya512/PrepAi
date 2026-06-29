@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiLogout, HiChevronDown } from 'react-icons/hi';
+import { HiLogout, HiChevronDown, HiSun, HiMoon } from 'react-icons/hi';
 import { useUser } from '../../context/userContext';
 import { getInitials } from '../../utils/helper';
 
@@ -8,6 +8,28 @@ const Navbar = () => {
   const { user, logout } = useUser();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    if (newTheme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -20,7 +42,7 @@ const Navbar = () => {
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        background: 'rgba(15, 15, 26, 0.85)',
+        background: 'var(--color-bg-header, rgba(15, 15, 26, 0.85))',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderBottom: '1px solid var(--color-border)',
@@ -78,120 +100,145 @@ const Navbar = () => {
         </button>
 
         {/* Right side */}
-        {user && (
-          <div style={{ position: 'relative' }}>
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.625rem',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-md)',
-                padding: '0.4rem 0.75rem',
-                cursor: 'pointer',
-                transition: 'background var(--transition-fast)',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(99,102,241,0.08)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
-            >
-              {/* Avatar */}
-              {user.profileImageUrl ? (
-                <img
-                  src={user.profileImageUrl}
-                  alt={user.name}
-                  style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    background: 'var(--gradient-primary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    color: 'white',
-                  }}
-                >
-                  {getInitials(user.name)}
-                </div>
-              )}
-              <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>
-                {user.name?.split(' ')[0]}
-              </span>
-              <HiChevronDown
-                size={16}
-                color="var(--color-text-muted)"
-                style={{
-                  transform: menuOpen ? 'rotate(180deg)' : 'rotate(0)',
-                  transition: 'transform var(--transition-fast)',
-                }}
-              />
-            </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            style={{
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              width: '38px',
+              height: '38px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: 'var(--color-text-primary)',
+              transition: 'background var(--transition-fast)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(99, 102, 241, 0.08)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)')}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {theme === 'dark' ? <HiSun size={20} /> : <HiMoon size={20} />}
+          </button>
 
-            {/* Dropdown */}
-            {menuOpen && (
-              <div
+          {user && (
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
                 style={{
-                  position: 'absolute',
-                  right: 0,
-                  top: 'calc(100% + 0.5rem)',
-                  minWidth: '180px',
-                  background: 'var(--color-bg-elevated)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.625rem',
+                  background: 'rgba(255,255,255,0.04)',
                   border: '1px solid var(--color-border)',
                   borderRadius: 'var(--radius-md)',
-                  overflow: 'hidden',
-                  boxShadow: 'var(--shadow-card)',
-                  zIndex: 100,
+                  padding: '0.4rem 0.75rem',
+                  cursor: 'pointer',
+                  transition: 'background var(--transition-fast)',
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(99,102,241,0.08)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
               >
-                <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--color-border)' }}>
-                  <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                    {user.name}
-                  </p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{user.email}</p>
-                </div>
-                <button
-                  onClick={handleLogout}
+                {/* Avatar */}
+                {user.profileImageUrl ? (
+                  <img
+                    src={user.profileImageUrl}
+                    alt={user.name}
+                    style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      background: 'var(--gradient-primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.65rem',
+                      fontWeight: 700,
+                      color: 'white',
+                    }}
+                  >
+                    {getInitials(user.name)}
+                  </div>
+                )}
+                <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                  {user.name?.split(' ')[0]}
+                </span>
+                <HiChevronDown
+                  size={16}
+                  color="var(--color-text-muted)"
                   style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.75rem 1rem',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#f87171',
-                    fontSize: '0.85rem',
-                    fontWeight: 500,
-                    fontFamily: 'Inter, sans-serif',
-                    transition: 'background var(--transition-fast)',
-                    textAlign: 'left',
+                    transform: menuOpen ? 'rotate(180deg)' : 'rotate(0)',
+                    transition: 'transform var(--transition-fast)',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
-                >
-                  <HiLogout size={16} />
-                  Sign Out
-                </button>
-              </div>
-            )}
+                />
+              </button>
 
-            {/* Click outside to close */}
-            {menuOpen && (
-              <div
-                style={{ position: 'fixed', inset: 0, zIndex: 90 }}
-                onClick={() => setMenuOpen(false)}
-              />
-            )}
-          </div>
-        )}
+              {/* Dropdown */}
+              {menuOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 'calc(100% + 0.5rem)',
+                    minWidth: '180px',
+                    background: 'var(--color-bg-elevated)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    overflow: 'hidden',
+                    boxShadow: 'var(--shadow-card)',
+                    zIndex: 100,
+                  }}
+                >
+                  <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--color-border)' }}>
+                    <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                      {user.name}
+                    </p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.75rem 1rem',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#f87171',
+                      fontSize: '0.85rem',
+                      fontWeight: 500,
+                      fontFamily: 'Inter, sans-serif',
+                      transition: 'background var(--transition-fast)',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
+                  >
+                    <HiLogout size={16} />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+
+              {/* Click outside to close */}
+              {menuOpen && (
+                <div
+                  style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+                  onClick={() => setMenuOpen(false)}
+                />
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
