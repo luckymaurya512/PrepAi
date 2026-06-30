@@ -8,6 +8,7 @@ export const API_PATHS = {
     BASE: '/api/sessions',
     BY_ID: (id) => `/api/sessions/${id}`,
     DELETE: (id) => `/api/sessions/${id}`,
+    GENERATE_MORE: (id) => `/api/sessions/${id}/generate-more`,
   },
   QUESTIONS: {
     ADD: '/api/questions/add',

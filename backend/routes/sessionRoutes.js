@@ -5,6 +5,7 @@ const {
   getAllSessions,
   getSessionById,
   deleteSession,
+  generateMoreQuestions,
 } = require('../controllers/sessionController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -14,5 +15,6 @@ router.post('/', createSession);
 router.get('/', getAllSessions);
 router.get('/:id', getSessionById);
 router.delete('/:id', deleteSession);
+router.post('/:id/generate-more', generateMoreQuestions);
 
 module.exports = router;

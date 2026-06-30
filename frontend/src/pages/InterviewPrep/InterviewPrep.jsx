@@ -17,6 +17,7 @@ const InterviewPrep = () => {
   const [session, setSession] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [generatingMore, setGeneratingMore] = useState(false);
   const [visibleCount, setVisibleCount] = useState(QUESTIONS_PER_PAGE);
 
   const fetchSession = useCallback(async () => {
@@ -40,6 +41,25 @@ const InterviewPrep = () => {
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
+
+  const handleGenerateMore = async () => {
+    setGeneratingMore(true);
+    try {
+      const { data } = await axiosInstance.post(API_PATHS.SESSIONS.GENERATE_MORE(sessionId));
+      setSession(data);
+      const sorted = [...(data.questions || [])].sort((a, b) => {
+        if (a.isPinned === b.isPinned) return 0;
+        return a.isPinned ? -1 : 1;
+      });
+      setQuestions(sorted);
+      setVisibleCount(sorted.length); // Show all questions including new ones
+      toast.success('Generated 5 more unique questions! 🚀');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to generate more questions');
+    } finally {
+      setGeneratingMore(false);
+    }
+  };
 
   const handlePinToggle = (questionId) => {
     setQuestions((prev) => {
@@ -131,16 +151,43 @@ const InterviewPrep = () => {
               ))}
             </div>
 
-            {hasMore && (
-              <div style={{ textAlign: 'center', paddingTop: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '2rem' }}>
+              {hasMore && (
                 <button
                   onClick={() => setVisibleCount((n) => n + QUESTIONS_PER_PAGE)}
                   className="btn-ghost"
+                  style={{ width: 'fit-content' }}
                 >
                   Load More Questions ({allQuestions.length - visibleCount} remaining)
                 </button>
-              </div>
-            )}
+              )}
+
+              <button
+                onClick={handleGenerateMore}
+                disabled={generatingMore}
+                className="btn-primary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 2rem',
+                  borderRadius: '999px',
+                  fontWeight: 700,
+                  boxShadow: 'var(--shadow-glow)',
+                  opacity: generatingMore ? 0.7 : 1,
+                  cursor: generatingMore ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {generatingMore ? (
+                  <>
+                    <div style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                    Generating 5 More Questions...
+                  </>
+                ) : (
+                  <>🤖 Generate 5 More AI Questions</>
+                )}
+              </button>
+            </div>
           </>
         )}
       </section>

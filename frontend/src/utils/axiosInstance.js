@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 30000, // 30s for AI responses
+  timeout: 120000, // 120s (2 minutes) to allow deep AI Q&A generation
   headers: {
     'Content-Type': 'application/json',
   },

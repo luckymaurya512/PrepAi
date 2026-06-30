@@ -138,4 +138,73 @@ const deleteSession = async (req, res) => {
   }
 };
 
-module.exports = { createSession, getAllSessions, getSessionById, deleteSession };
+// @desc    Generate 5 more unique questions for an existing session
+// @route   POST /api/sessions/:id/generate-more
+// @access  Private
+const generateMoreQuestions = async (req, res) => {
+  try {
+    const session = await Session.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    }).populate('questions');
+
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+
+    // Extract existing question strings to exclude them
+    const existingQuestionTexts = session.questions.map((q) => q.question);
+
+    const result = await generateQuestionsAndAnswers(
+      session.role,
+      session.experience,
+      session.topicsToFocus,
+      existingQuestionTexts
+    );
+
+    const generatedQA = result?.questions || [];
+    const isAIGenerated = result?.isAIGenerated || false;
+
+    if (generatedQA && generatedQA.length > 0) {
+      const questionDocs = await Question.insertMany(
+        generatedQA.map((qa) => ({
+          sessionId: session._id,
+          question: qa.question,
+          answer: qa.answer,
+          isPinned: false,
+        }))
+      );
+
+      // Append new question IDs and update AI status flag
+      const newQuestionIds = questionDocs.map((q) => q._id);
+      session.questions.push(...newQuestionIds);
+      
+      // If any of the runs used fallback, keep it as fallback status, else update
+      if (isAIGenerated) {
+        session.isAIGenerated = true; 
+      }
+      
+      await session.save();
+
+      // Return updated populated session
+      const updatedSession = await Session.findById(session._id).populate({
+        path: 'questions',
+        options: { sort: { isPinned: -1, createdAt: 1 } },
+      });
+      return res.json(updatedSession);
+    }
+
+    res.status(400).json({ message: 'Failed to generate additional questions' });
+  } catch (error) {
+    console.error('Generate more questions error:', error.message);
+    res.status(500).json({ message: 'Server error generating more questions' });
+  }
+};
+
+module.exports = { 
+  createSession, 
+  getAllSessions, 
+  getSessionById, 
+  deleteSession,
+  generateMoreQuestions 
+};

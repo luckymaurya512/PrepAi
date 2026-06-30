@@ -292,13 +292,18 @@ const Dashboard = () => {
                     onChange={handleFormChange}
                     className="input-field"
                     required
-                    style={{ appearance: 'none', cursor: 'pointer' }}
+                    style={{ 
+                      appearance: 'none', 
+                      cursor: 'pointer',
+                      background: 'var(--color-bg-input)',
+                      color: 'var(--color-text-primary)'
+                    }}
                   >
-                    <option value="" disabled>Select a role...</option>
+                    <option value="" disabled style={{ color: 'var(--color-text-muted)', background: 'var(--color-bg-card)' }}>Select a role...</option>
                     {TECH_ROLES.map((r) => (
-                      <option key={r} value={r} style={{ background: '#16162a' }}>{r}</option>
+                      <option key={r} value={r} style={{ color: 'var(--color-text-primary)', background: 'var(--color-bg-card)' }}>{r}</option>
                     ))}
-                    <option value="custom" style={{ background: '#16162a' }}>Custom Role...</option>
+                    <option value="custom" style={{ color: 'var(--color-text-primary)', background: 'var(--color-bg-card)' }}>Custom Role...</option>
                   </select>
                 </div>
 

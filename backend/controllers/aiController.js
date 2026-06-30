@@ -85,7 +85,7 @@ const getFallbackQuestions = (role, experience, topicsToFocus) => {
  * Generate interview questions and answers using Gemini API
  * Called internally by sessionController
  */
-const generateQuestionsAndAnswers = async (role, experience, topicsToFocus) => {
+const generateQuestionsAndAnswers = async (role, experience, topicsToFocus, excludeQuestions = []) => {
   try {
     const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
@@ -93,35 +93,46 @@ const generateQuestionsAndAnswers = async (role, experience, topicsToFocus) => {
       ? `Focus especially on these topics: ${topicsToFocus}.`
       : '';
 
-    const prompt = `You are an expert technical interviewer. Generate exactly 10 high-quality interview questions and detailed answers for a ${experience} ${role} position.
-${topicClause}
+    const excludeClause = excludeQuestions.length > 0
+      ? `\nCRITICAL: DO NOT generate any of the following questions (or very similar ones):\n${excludeQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}`
+      : '';
 
-Return ONLY a valid JSON array (no markdown, no code fences, no explanation) in this exact format:
-[
-  {
-    "question": "Question text here",
-    "answer": "Comprehensive answer here with examples and best practices"
-  }
-]
+    const prompt = `You are an expert technical interviewer. Generate exactly 5 high-quality interview questions and detailed answers for a ${experience} ${role} position.
+${topicClause}${excludeClause}
+
+Format the output strictly as a text document where each question is prefixed with [QUESTION] on a new line, and each answer is prefixed with [ANSWER] on a new line.
+
+Example format:
+[QUESTION]
+What is React?
+[ANSWER]
+React is a JavaScript library for building user interfaces.
 
 Make the questions progressively more challenging. Include a mix of conceptual, practical, and scenario-based questions. The answers should be thorough, professional, and include code examples where appropriate using markdown code blocks.`;
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json'
-      }
-    });
+    const result = await model.generateContent(prompt);
     const text = result.response.text();
 
-    // Clean up the response - remove any markdown fencing if present
-    const cleaned = text
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
+    // Parse the [QUESTION] and [ANSWER] blocks
+    const parsedQuestions = [];
+    const questionBlocks = text.split(/\[QUESTION\]/i).slice(1); // skip preamble if any
 
-    const parsed = JSON.parse(cleaned);
-    return { questions: parsed, isAIGenerated: true };
+    for (const block of questionBlocks) {
+      const parts = block.split(/\[ANSWER\]/i);
+      if (parts.length >= 2) {
+        const question = parts[0].trim();
+        const answer = parts[1].trim();
+        if (question && answer) {
+          parsedQuestions.push({ question, answer });
+        }
+      }
+    }
+
+    if (parsedQuestions.length === 0) {
+      throw new Error('Failed to parse any questions from response text');
+    }
+
+    return { questions: parsedQuestions, isAIGenerated: true };
   } catch (error) {
     console.warn(`⚠️ Gemini API error: ${error.message}. Returning fallback questions.`);
     return { questions: getFallbackQuestions(role, experience, topicsToFocus), isAIGenerated: false };
