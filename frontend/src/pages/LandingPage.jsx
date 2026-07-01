@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LANDING_FEATURES, HOW_IT_WORKS } from '../utils/data';
 import { useUser } from '../context/userContext';
+import logo from '../assets/PrepAi_logo.png';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -53,19 +54,15 @@ const LandingPage = () => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <div
+            <img
+              src={logo}
+              alt="PrepAI Logo"
               style={{
                 width: '32px',
                 height: '32px',
-                borderRadius: '8px',
-                background: 'var(--gradient-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                objectFit: 'contain',
               }}
-            >
-              🤖
-            </div>
+            />
             <span
               style={{
                 fontWeight: 800,
@@ -556,7 +553,15 @@ const LandingPage = () => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <span style={{ fontSize: '1rem' }}>🤖</span>
+          <img
+            src={logo}
+            alt="PrepAI Logo"
+            style={{
+              width: '24px',
+              height: '24px',
+              objectFit: 'contain',
+            }}
+          />
           <span
             style={{
               fontWeight: 700,

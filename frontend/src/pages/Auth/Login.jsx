@@ -7,6 +7,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { validateEmail } from '../../utils/helper';
 import { useUser } from '../../context/userContext';
+import logo from '../../assets/PrepAi_logo.png';
 
 const Login = () => {
   const { login } = useUser();
@@ -75,21 +76,16 @@ const Login = () => {
       >
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div
+          <img
+            src={logo}
+            alt="PrepAI Logo"
             style={{
               width: '48px',
               height: '48px',
-              borderRadius: '12px',
-              background: 'var(--gradient-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.5rem',
+              objectFit: 'contain',
               margin: '0 auto 1rem',
             }}
-          >
-            🤖
-          </div>
+          />
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '0.5rem' }}>
             Welcome Back
           </h1>

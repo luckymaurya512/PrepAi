@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { HiLogout, HiChevronDown, HiSun, HiMoon } from 'react-icons/hi';
 import { useUser } from '../../context/userContext';
 import { getInitials } from '../../utils/helper';
+import logo from '../../assets/PrepAi_logo.png';
 
 const Navbar = () => {
   const { user, logout } = useUser();
@@ -71,20 +72,15 @@ const Navbar = () => {
             gap: '0.5rem',
           }}
         >
-          <div
+          <img
+            src={logo}
+            alt="PrepAI Logo"
             style={{
               width: '32px',
               height: '32px',
-              borderRadius: '8px',
-              background: 'var(--gradient-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1rem',
+              objectFit: 'contain',
             }}
-          >
-            🤖
-          </div>
+          />
           <span
             style={{
               fontWeight: 800,
